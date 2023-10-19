@@ -128,4 +128,4 @@ dist
 frontend/.svelte-kit
 frontend/node_modules
 .idea
-static
+/static
