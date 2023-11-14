@@ -49,28 +49,37 @@
 
 						{#if result.answers.length > 0}
 							<ul class="space-y-2">
-								{#each result.answers as answers}
+								{#each result.answers.sort((a, b) => b.users.length - a.users.length) as answers}
 									{#if answers.users.length > 0 || answers.correct.length > 0}
 										{#if answers.correct.length > 0}
 											<li
 												class="flex items-center p-4 bg-green-900 rounded-xl justify-between overflow-x-auto"
+												title="Ответ отмеченный как верный"
 											>
 												<span class="">{answers.answer}</span>
-												<span class="text-neutral-300">({answers.users.length})</span>
+												<span class="text-neutral-300" title="Количество людей выбравших этот ответ"
+													>({answers.users.length})</span
+												>
 											</li>
 										{:else if answers.not_correct.length > 0}
 											<li
 												class="flex items-center p-4 bg-red-900 rounded-xl justify-between overflow-x-auto"
+												title="Ответ отмеченный как неверный"
 											>
 												<span class="">{answers.answer}</span>
-												<span class="text-neutral-300">({answers.users.length})</span>
+												<span class="text-neutral-300" title="Количество людей выбравших этот ответ"
+													>({answers.users.length})</span
+												>
 											</li>
 										{:else}
 											<li
 												class="flex items-center p-4 bg-neutral-700 rounded-xl justify-between overflow-x-auto"
+												title="Ответ выбранный хотябы одним пользователем"
 											>
 												<span class="">{answers.answer}</span>
-												<span class="text-neutral-300">({answers.users.length})</span>
+												<span class="text-neutral-300" title="Количество людей выбравших этот ответ"
+													>({answers.users.length})</span
+												>
 											</li>
 										{/if}
 									{/if}
