@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/gin-contrib/cors"
+	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/goccy/go-json"
 	"os"
@@ -38,37 +39,35 @@ func init() {
 	searchResults = questions
 }
 
+func showResults(c *gin.Context) {
+	searchQuery := c.Param("query")
+
+	searchQueryLower := strings.ToLower(strings.TrimSpace(searchQuery))
+	results := make([]Question, 0)
+
+	for _, question := range searchResults {
+		if strings.HasPrefix(strings.ToLower(question.Question), searchQueryLower) {
+			results = append(results, question)
+		}
+	}
+
+	if len(results) > 5 {
+		results = results[:5]
+	}
+
+	c.JSON(200, results)
+
+}
+
 func main() {
 	router := gin.Default()
 	router.Use(cors.Default())
+	router.Use(static.Serve("/", static.LocalFile("./static", false)))
 
-	router.Static("/", "./static")
-
-	router.POST("/questions", func(c *gin.Context) {
-		var searchQuery struct {
-			SearchQuery string `json:"searchQuery"`
-		}
-
-		if err := c.BindJSON(&searchQuery); err != nil {
-			c.JSON(400, gin.H{"error": "Invalid request"})
-			return
-		}
-
-		searchQueryLower := strings.ToLower(strings.TrimSpace(searchQuery.SearchQuery))
-		results := make([]Question, 0)
-
-		for _, question := range searchResults {
-			if strings.HasPrefix(strings.ToLower(question.Question), searchQueryLower) {
-				results = append(results, question)
-			}
-		}
-
-		if len(results) > 5 {
-			results = results[:5]
-		}
-
-		c.JSON(200, results)
-	})
+	apiv1 := router.Group("/api/v1")
+	{
+		apiv1.GET("/search/:query", showResults)
+	}
 
 	router.Run(":8082")
 }

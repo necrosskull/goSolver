@@ -12,14 +12,8 @@
 		}
 
 		timeout = setTimeout(async () => {
-			const response = await fetch('http://localhost:8082/questions', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({
-					searchQuery
-				})
+			const response = await fetch(`http://localhost:8082/api/v1/search/${searchQuery}`, {
+				method: 'GET'
 			});
 
 			searchResults = await response.json();
@@ -56,10 +50,17 @@
 						{#if result.answers.length > 0}
 							<ul class="space-y-2">
 								{#each result.answers as answers}
-									{#if answers.users.length > 0}
+									{#if answers.users.length > 0 || answers.correct.length > 0}
 										{#if answers.correct.length > 0}
 											<li
 												class="flex items-center p-4 bg-green-900 rounded-xl justify-between overflow-x-auto"
+											>
+												<span class="">{answers.answer}</span>
+												<span class="text-neutral-300">({answers.users.length})</span>
+											</li>
+										{:else if answers.not_correct.length > 0}
+											<li
+												class="flex items-center p-4 bg-red-900 rounded-xl justify-between overflow-x-auto"
 											>
 												<span class="">{answers.answer}</span>
 												<span class="text-neutral-300">({answers.users.length})</span>
